@@ -1,7 +1,11 @@
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/router';
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import { css } from '@emotion/core';
 import styled from '@emotion/styled';
+
+import clienteAxios from '../config/axios';
 
 import Layout from '../components/layout/layout';
 import Buscar from '../components/ui/Buscar';
@@ -25,94 +29,50 @@ const Pais = styled.div`
   span {
     font-weight: 600;
   }
+
+  img {
+    height: 22rem;
+  }
 `;
 
 export default function Home() {
 
-  const paises = [
-    {
-      name: "Nicaragua",
-      flag: "https://restcountries.eu/data/abw.svg",
-      population: 50000,
-      region: "america",
-      capital: "Managua"
-    },
-    {
-      name: "Costa Rica",
-      flag: "https://restcountries.eu/data/abw.svg",
-      population: 50000,
-      region: "america",
-      capital: "San José"
-    },
-    {
-      name: "Guatemala",
-      flag: "https://restcountries.eu/data/abw.svg",
-      population: 50000,
-      region: "america",
-      capital: "Managua"
-    },
-    {
-      name: "Honduras",
-      flag: "https://restcountries.eu/data/abw.svg",
-      population: 50000,
-      region: "america",
-      capital: "Managua"
-    },
-    {
-      name: "El Salvador",
-      flag: "https://restcountries.eu/data/abw.svg",
-      population: 50000,
-      region: "america",
-      capital: "San Salvador"
-    },
-    {
-      name: "Honduras",
-      flag: "https://restcountries.eu/data/abw.svg",
-      population: 50000,
-      region: "america",
-      capital: "Managua"
-    },
-    {
-      name: "El Salvador",
-      flag: "https://restcountries.eu/data/abw.svg",
-      population: 50000,
-      region: "america",
-      capital: "San Salvador"
-    },
-    {
-      name: "Honduras",
-      flag: "https://restcountries.eu/data/abw.svg",
-      population: 50000,
-      region: "america",
-      capital: "Managua"
-    },
-    {
-      name: "El Salvador",
-      flag: "https://restcountries.eu/data/abw.svg",
-      population: 50000,
-      region: "america",
-      capital: "San Salvador"
-    },
-    {
-      name: "Honduras",
-      flag: "https://restcountries.eu/data/abw.svg",
-      population: 50000,
-      region: "america",
-      capital: "Managua"
-    },
-    {
-      name: "El Salvador",
-      flag: "https://restcountries.eu/data/abw.svg",
-      population: 50000,
-      region: "america",
-      capital: "San Salvador"
-    }
-  ]
+  // State de países
+  const [ paises, setPaises ] = useState([]);
+
+  // Hook de router
+  const router = useRouter();
+  const { query : { busqueda, region } } = router;
+
+  useEffect(() => {
+    const obtenerPaises = async () => {
+      try {
+        let respuesta;
+
+        if (busqueda) {
+          respuesta = await clienteAxios.get(`/name/${busqueda}`);
+          console.log(respuesta);
+        } else {
+          respuesta = await clienteAxios.get('/all');
+        }
+        
+        if (region) {
+          setPaises(respuesta.data.filter(r => (r.region === region)));
+          return;
+        }
+
+        setPaises(respuesta.data);
+      } catch (error) {
+        console.log(error);
+        setPaises([]);
+      }
+    };
+    obtenerPaises();
+  }, [busqueda, region]);
 
   return (
     <Layout>
       <div css={css`
-        background-color: #202C37;
         color: white;
       `}>
         <div className="contenedor">
@@ -126,15 +86,18 @@ export default function Home() {
             flex-wrap: wrap;
           `}>
             {paises.map(pais => (
-              <div css={css`
-                width: 20%;
-                margin-right: 6.66%;
-                margin-bottom: 5%;
-                
-                :nth-of-type(4n) {
-                  margin-right: 0;
-                }
-              `}>
+              <div 
+                key={pais.numericCode}
+                css={css`
+                  width: 20%;
+                  margin-right: 6.66%;
+                  margin-bottom: 5%;
+                  
+                  :nth-of-type(4n) {
+                    margin-right: 0;
+                  }
+                `}
+              >
                 <Pais>
                   <img src={pais.flag} />
 

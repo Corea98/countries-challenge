@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import Router from 'next/router';
 import styled from '@emotion/styled';
 import { css } from '@emotion/core';
 
@@ -39,11 +40,44 @@ const Select = styled.select`
 `;
 
 const Buscar = () => {
+
+    const [busqueda, setBusqueda] = useState('');
+    const [region, setRegion] = useState(null);
+    const [enviarBusqueda, setEnviarBusqueda] = useState(false);
+
+    // Al presionar enter
+    const handleSubmit = e => {
+        e.preventDefault();
+        
+        setEnviarBusqueda(true);
+    }
+
+    // Enviar los datos al index para luego hacer la búsqueda
+    useEffect(() => {
+        const buscar = () => {
+            // Redireccionar a la página principal con los parámetros de búsqueda
+            let query = {};
+
+            if (region) query.region = region;
+            if (busqueda.trim() !== '') query.busqueda = busqueda;
+
+            Router.push({
+                pathname: '/',
+                query
+            });
+        }
+        buscar();
+        setEnviarBusqueda(false);
+    }, [region, enviarBusqueda])
+
     return (
-        <form css={css`
-            display: flex;
-            justify-content: space-between;
-        `}>
+        <form
+            css={css`
+                display: flex;
+                justify-content: space-between;
+            `}
+            onSubmit={handleSubmit}
+        >
 
             <div css={css`
                 display: flex;
@@ -60,17 +94,21 @@ const Buscar = () => {
                 <InputText
                     type="text"
                     placeholder="Search for country..."
+                    onChange={e => setBusqueda(e.target.value)}
                 />
             </div>
 
             <div>
-                <Select>
-                    <option selected disabled>Filter by Region</option>
-                    <option>Africa</option>
-                    <option>América</option>
-                    <option>Asia</option>
-                    <option>Europe</option>
-                    <option>Oceania</option>
+                <Select
+                    onChange={e => {setRegion(e.target.value)}}
+                    defaultValue=""
+                >
+                    <option value="">Filter by Region</option>
+                    <option value='Africa'>Africa</option>
+                    <option value='Americas'>América</option>
+                    <option value='Asia'>Asia</option>
+                    <option value='Europe'>Europe</option>
+                    <option value='Oceania'>Oceania</option>
                 </Select>
             </div>
         </form>
