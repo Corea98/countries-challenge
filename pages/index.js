@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
+import Router from 'next/router';
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 import { css } from '@emotion/core';
@@ -7,7 +9,7 @@ import styled from '@emotion/styled';
 
 import clienteAxios from '../config/axios';
 
-import Layout from '../components/layout/layout';
+import Layout from '../components/layout/Layout';
 import Buscar from '../components/ui/Buscar';
 
 const Pais = styled.div`
@@ -31,21 +33,40 @@ const Pais = styled.div`
   }
 
   img {
-    height: 22rem;
+    width: 100%;
+
+    @media screen and (min-width: 1201px) {
+      height: 18rem;
+    }
+
+    @media screen and (max-width: 1200px) {
+      height: 22rem;
+    }
+
+    @media screen and (max-width: 375px) {
+      width: 100%;
+    }
+  }
+
+  &:hover {
+    cursor: pointer;
   }
 `;
 
 export default function Home() {
 
   // State de países
-  const [ paises, setPaises ] = useState([]);
+  const [paises, setPaises] = useState([]);
+  const [cargando, setCargando] = useState(true);
 
   // Hook de router
   const router = useRouter();
-  const { query : { busqueda, region } } = router;
+  const { query: { busqueda, region } } = router;
 
   useEffect(() => {
     const obtenerPaises = async () => {
+      setCargando(true);
+
       try {
         let respuesta;
 
@@ -55,9 +76,10 @@ export default function Home() {
         } else {
           respuesta = await clienteAxios.get('/all');
         }
-        
+
         if (region) {
           setPaises(respuesta.data.filter(r => (r.region === region)));
+          setCargando(false);
           return;
         }
 
@@ -66,6 +88,8 @@ export default function Home() {
         console.log(error);
         setPaises([]);
       }
+
+      setCargando(false);
     };
     obtenerPaises();
   }, [busqueda, region]);
@@ -79,38 +103,76 @@ export default function Home() {
 
           <Buscar />
 
+          {/* CONTENEDOR DE PAÍSES */}
           <div css={css`
             margin-top: 4rem;
             width: 100%;
             display: flex;
             flex-wrap: wrap;
           `}>
-            {paises.map(pais => (
-              <div 
-                key={pais.numericCode}
-                css={css`
-                  width: 20%;
-                  margin-right: 6.66%;
-                  margin-bottom: 5%;
-                  
-                  :nth-of-type(4n) {
-                    margin-right: 0;
-                  }
-                `}
-              >
-                <Pais>
-                  <img src={pais.flag} />
+            {cargando ? 'Obteniendo los datos...' : (
+              <>
+                {
+                  paises.map(pais => (
+                    /* CONTEEDOR DE PAÍS */
+                    <div
+                      key={pais.alpha3Code}
+                      css={css`
+                        
+                        @media screen and (min-width: 1201px) {
+                          width: 20%;
+                          margin-right: 6.66%;
+                          margin-bottom: 5%;
+                          
+                          :nth-of-type(4n) {
+                            margin-right: 0;
+                          }
+                        }
 
-                  <div>
-                    <strong>{pais.name}</strong>
+                        @media only screen and (max-width: 1200px) and (min-width: 831px) {
+                          width: 28.33%;
+                          margin-right: 7.5%;
+                          margin-bottom: 5%;
 
-                    <p><span>Pupulation: </span>{pais.population}</p>
-                    <p><span>Region: </span>{pais.region}</p>
-                    <p><span>Captial: </span>{pais.capital}</p>
-                  </div>
-                </Pais>
-              </div>
-            ))}
+                          :nth-of-type(3n) {
+                            margin-right: 0;
+                          }
+                        }
+
+                        @media only screen and (max-width: 830px) {
+                          width: 45%;
+                          margin-right: 10%;
+                          margin-bottom: 5%;
+
+                          :nth-of-type(2n) {
+                            margin-right: 0;
+                          }
+                        }
+
+                        @media screen and (max-width: 570px) {
+                          width: 80%;
+                          margin: 0 auto 10% auto !important;
+                        }
+                      `}
+                    >
+                      <Link href="/pais/[id]" as={`/pais/${pais.alpha3Code}`}>
+                        <Pais>
+                          <img src={pais.flag} />
+
+                          <div>
+                            <strong>{pais.name}</strong>
+
+                            <p><span>Pupulation: </span>{pais.population}</p>
+                            <p><span>Region: </span>{pais.region}</p>
+                            <p><span>Captial: </span>{pais.capital}</p>
+                          </div>
+                        </Pais>
+                      </Link>
+                    </div>
+                  ))
+                }
+              </>
+            )}
           </div>
         </div>
       </div>
