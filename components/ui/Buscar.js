@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import Router from 'next/router';
 import styled from '@emotion/styled';
 import { css } from '@emotion/core';
+
+import { DarkModeContext } from '../../context/DarkModeContext';
 
 const InputText = styled.input`
     border: none;
     padding: 1.7rem 0;
     font-size: 1.4rem;
-    background-color: #2B3945;
-    color: white;
     width: 100%;
 
-    ::placeholder { color: white; }
+    ${'' /* ::placeholder { color: white; } */}
 
     outline:none !important;
     outline-width: 0 !important;
@@ -24,12 +24,8 @@ const Select = styled.select`
     border: none;
     padding: 1.7rem;
     font-size: 1.4rem;
-    background-color: #2B3945;
-    color: white;
     border-radius: 0.3rem;
     width: 200px;
-
-    ::placeholder { color: white; }
 
     outline:none !important;
     outline-width: 0 !important;
@@ -40,6 +36,9 @@ const Select = styled.select`
 `;
 
 const Buscar = () => {
+
+    // Context
+    const { darkMode } = useContext(DarkModeContext);
 
     const [busqueda, setBusqueda] = useState('');
     const [region, setRegion] = useState(null);
@@ -79,10 +78,11 @@ const Buscar = () => {
             onSubmit={handleSubmit}
         >
 
+            {/* BARRA DE BÚSQUEDA */}
             <div css={css`
                 display: flex;
                 align-items: center;
-                background-color: #2B3945;
+                background-color: ${ darkMode ? '#2B3945': 'white'};
                 border-radius: 0.3rem;
                 width: 500px;
             `}>

@@ -10,18 +10,27 @@ import Layout from '../../components/layout/Layout';
 import Boton from '../../components/ui/Boton';
 
 const ContenedorDerecha = styled.div`
-    color: white;
     height: 80px;
-    width: 50%;
     padding-top: 2rem;
 
     h2 {
         font-size: 4rem;
         font-weight: bold;
     }
+
+    @media (min-width: 1101px) {
+        width: 50%;
+    }
+
+    @media (min-width: 0) and (max-width: 1100px) {
+        width: 100%;
+        margin: 0 auto;
+    }
 `;
 
 const Pais = () => {
+
+    // Context
 
     // States
     const [pais, setPais] = useState(null);
@@ -33,6 +42,8 @@ const Pais = () => {
     const { query: { id } } = router;
 
     useEffect(() => {
+        setLoading(true);
+
         if (id) {
             const obtenerPais = async () => {
                 try {
@@ -43,6 +54,7 @@ const Pais = () => {
                 } catch (error) {
                     console.log(error);
                     setError(true);
+                    setLoading(false);
                 }
             }
             obtenerPais();
@@ -52,7 +64,7 @@ const Pais = () => {
     return (
         <Layout>
             <div className="contenedor">
-                {loading ? <p>Cargando...</p> : (
+                {loading ? <p css={css` font-size: 1.6rem`}>Cargando...</p> : (
                     <>
                         <Link href="/">
                             <Boton css={css`
@@ -60,18 +72,34 @@ const Pais = () => {
                         `}>← Back</Boton>
                         </Link>
 
-                        {error ? <p>No se pudo realizar la acción solicitada</p> : (
+                        {error ? <p css={css` font-size: 1.6rem; margin-top: 5rem;`}>No se pudo realizar la acción solicitada</p> : (
                             /* CONTENEDOR PRINCIPAL */
                             <div css={css`
-                            display: flex;
-                            justify-content: space-between;
                             margin-top: 8rem;
+
+                            @media (min-width: 1101px) {
+                                display: flex;
+                                justify-content: space-between;
+                            }
+
+                            @media (min-width: 0) and (max-width: 1100px) {
+                                display: flex;
+                                flex-wrap: wrap;
+                            }
                         `}>
                                 {/* IMAGEN IZQUIERDA */}
                                 <img
                                     src={pais.flag}
                                     css={css`
-                                    width: 40%;
+
+                                    @media (min-width: 1101px) {
+                                        width: 40%;
+                                    }
+
+                                    @media (min-width: 0) and (max-width: 1100px) {
+                                        width: 90%;
+                                        margin: 0 auto;
+                                    }
                                 `}
                                 />
 
@@ -88,12 +116,21 @@ const Pais = () => {
                                             margin-bottom: 1.8rem;
                                             font-size: 1.4rem;
                                         }
+
+                                        @media (max-width: 650px) {
+                                            flex-wrap: wrap;
+                                        }
                                     `}>
                                         <div css={css`
                                             width: 50%;
+
+                                            @media (max-width: 650px) {
+                                                width: 90%;
+                                                margin-bottom: 3rem;
+                                            }
                                         `}>
                                             <p><strong>Native Name:</strong> {pais.nativeName}</p>
-                                            <p><strong>Population:</strong> {pais.population}</p>
+                                            <p><strong>Population:</strong> {new Intl.NumberFormat().format(pais.population)}</p>
                                             <p><strong>Region:</strong> {pais.region}</p>
                                             <p><strong>Sub Region:</strong> {pais.subregion}</p>
                                             <p><strong>Capital:</strong> {pais.capital}</p>
@@ -101,6 +138,10 @@ const Pais = () => {
 
                                         <div css={css`
                                             width: 50%;
+
+                                            @media (max-width: 650px) {
+                                                width: 90%;
+                                            }
                                         `}>
                                             <p><strong>Top Level Domain:</strong> {pais.topLevelDomain}</p>
                                             <p><strong>Currencies:</strong> {pais.currencies.map((currency, id) => (currency.name + ((pais.currencies.length - 1 !== id) ? ', ' : '')))}</p>
@@ -113,11 +154,21 @@ const Pais = () => {
                                         display: flex;
                                         flex-wrap: wrap;
                                         margin-top: 7rem;
+
+                                        @media (max-width: 650px) {
+                                            p {
+                                                margin-right: 60%;
+                                                margin-bottom: 3rem;
+                                            }
+                                        }
                                     `}>
                                         <p>Border Countries: </p>
 
                                         { pais.borders.map(border => (
-                                            <Link href="/pais/[id]" as={`/pais/${border}`} >
+                                            <Link 
+                                                key={border}
+                                                href="/pais/[id]" as={`/pais/${border}`} 
+                                            >
                                                 <div css={css`
                                                     margin-left: 2rem;
                                                     margin-bottom: 2rem;

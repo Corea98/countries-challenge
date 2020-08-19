@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Router from 'next/router';
@@ -12,11 +12,12 @@ import clienteAxios from '../config/axios';
 import Layout from '../components/layout/Layout';
 import Buscar from '../components/ui/Buscar';
 
+import { DarkModeContext } from '../context/DarkModeContext';
+
 const Pais = styled.div`
-  background-color: #2B3945;
+  background-color: ${props => props.darkMode ? '#2B3945': 'white'};
   border-radius: 3px;
-  overflow: hidden;
-  
+  overflow: hidden;  
 
   div {
     padding: 2.3rem 3rem;
@@ -55,6 +56,9 @@ const Pais = styled.div`
 
 export default function Home() {
 
+  // Context
+  const { darkMode, cargandoDarkMode } = useContext(DarkModeContext);
+
   // State de países
   const [paises, setPaises] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -72,7 +76,6 @@ export default function Home() {
 
         if (busqueda) {
           respuesta = await clienteAxios.get(`/name/${busqueda}`);
-          console.log(respuesta);
         } else {
           respuesta = await clienteAxios.get('/all');
         }
@@ -94,14 +97,15 @@ export default function Home() {
     obtenerPaises();
   }, [busqueda, region]);
 
+  // No mostrar nada si no se ha cargado la información
+  if (cargandoDarkMode) return null;
+
   return (
     <Layout>
-      <div css={css`
-        color: white;
-      `}>
+      <div>
         <div className="contenedor">
 
-          <Buscar />
+          <Buscar/>
 
           {/* CONTENEDOR DE PAÍSES */}
           <div css={css`
@@ -156,7 +160,9 @@ export default function Home() {
                       `}
                     >
                       <Link href="/pais/[id]" as={`/pais/${pais.alpha3Code}`}>
-                        <Pais>
+                        <Pais
+                          darkMode={darkMode}
+                        >
                           <img src={pais.flag} />
 
                           <div>

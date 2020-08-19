@@ -10,7 +10,6 @@ html {
 body {
   font-family: 'Nunito Sans', sans-serif;
   font-size: 1.4rem;
-  background-color: #202C37;
 }
 
 ul {
@@ -29,19 +28,26 @@ img {
 
 
 
-.contenedor {
-  max-width: 1440px;
-  width: 95%;
-  padding: 4rem 0;
-  margin: 0 auto;
-}
 
-.bg-dark {
-  background-color: #2B3945;
-  color: white;
-}
 
 * {
   
   letter-spacing: 0.1rem;
+}
+
+.contenedor {
+  max-width: 1440px;
+  width: 90%;
+  padding: 4rem 0;
+  margin: 0 auto;
+}
+
+.dark-blue {
+  background-color: #2B3945;
+  color: white;
+}
+
+.very-dark {
+  background-color: #202C37;
+  color: white;
 }
